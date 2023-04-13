@@ -63,6 +63,8 @@ if __name__ == '__main__':
             print('No learnt clause')
             print()
             continue
+        else:
+            print('Learnt Clause: {:}'.format(len(learnt)))
 
         # Statistics hot
         learnt_times = [0] * len(x_data)
