@@ -34,7 +34,7 @@ if __name__ == '__main__':
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
-    for circuit_name in NAME_LIST[:10]:
+    for ckt_idx, circuit_name in enumerate(NAME_LIST):
         ckt_filename = os.path.join(src_folder, '{}.bench'.format(circuit_name))
         if not os.path.exists(ckt_filename):
             continue
@@ -49,15 +49,19 @@ if __name__ == '__main__':
 
         # Save CNF and Solve
         cnf = aiger_utils.aig_to_cnf(x_data, fanin_list, gate_to_index, [], [po_idx])
-        print('Circuit Name: {}, Size: {}, CNF Size: {}'.format(circuit_name, len(x_data), len(cnf)))
+        print('='*20)
+        print('Circuit Name: {}, [{:} / {:}]'.format(circuit_name, ckt_idx, len(NAME_LIST)))
+        print('Size: {}, CNF Size: {}'.format(len(x_data), len(cnf)))
         is_sat, asg, learnt, runtime = cnf_utils.solve_with_learnt(solver, cnf, len(x_data), mode='time={:}'.format(MAX_SOLVE_TIME))
         if is_sat == -1:
             print('Unknown')
+            print()
             continue
         else:
             print('SAT' if is_sat else 'UNSAT')
         if len(learnt) == 0:
             print('No learnt clause')
+            print()
             continue
 
         # Statistics hot
@@ -74,9 +78,8 @@ if __name__ == '__main__':
             'edge_index': edge_data, 
             'x_hot': learnt_times
         }
-
-        print('='*20)
         print()
+
         
     output_filename = os.path.join(output_folder, 'graphs.npz')
     np.savez_compressed(output_filename, graphs=graphs)
